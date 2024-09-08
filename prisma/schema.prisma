@@ -1,0 +1,122 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Employee {
+  id                Int           @id @default(autoincrement())
+  employeeIdNumber  String        @unique @map("employee_id_number")
+  name              String
+  email             String        @unique
+  backAccountNumber String        @map("back_account_number")
+  basicSalary       Int           @map("basic_salary")
+  basicSalaryCode   String        @map("basic_salary_code")
+  status            Status
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  payrollItems      PayrollItem[]
+
+  @@map("employees")
+}
+
+model DeductionType {
+  id         Int         @id @default(autoincrement())
+  typeName   String      @map("type_name")
+  isCentral  Boolean     @map("is_central")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  deductions Deduction[]
+
+  @@unique([typeName, isCentral])
+  @@map("deduction_types")
+}
+
+model Payroll {
+  id           Int           @id @default(autoincrement())
+  month        Int
+  year         Int
+  payrollItems PayrollItem[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@map("payrolls")
+}
+
+model PayrollItem {
+  id                  Int         @id @default(autoincrement())
+  payroll             Payroll     @relation(fields: [payrollId], references: [id])
+  payrollId           Int         @map("payroll_id")
+  employee            Employee    @relation(fields: [employeeId], references: [id])
+  employeeId          Int         @map("employee_id")
+  basicSalary         Int         @map("basic_salary")
+  adjustedBasicSalary Int         @map("adjusted_basic_salary")
+  netSalary           Int         @map("net_salary")
+  deductions          Deduction[]
+  deductionAmount     Int         @map("deduction_amount")
+  allowances          Allowance[]
+  allowanceAmount     Int         @map("allowance_amount")
+  createdAt           DateTime    @default(now()) @map("created_at")
+  updatedAt           DateTime    @updatedAt @map("updated_at")
+
+  @@map("payroll_items")
+}
+
+model Deduction {
+  id              Int           @id @default(autoincrement())
+  deductionType   DeductionType @relation(fields: [deductionTypeId], references: [id])
+  deductionTypeId Int           @map("deduction_type_id")
+  amount          Int
+  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id])
+  payrollItemId   Int           @map("payroll_item_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@unique([payrollItemId, deductionTypeId])
+  @@map("deductions")
+}
+
+model AllowanceType {
+  id         Int         @id @default(autoincrement())
+  typeName   String      @map("type_name")
+  isCentral  Boolean     @map("is_central")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  allowances Allowance[]
+
+  @@unique([typeName, isCentral])
+  @@map("allowance_types")
+}
+
+model Allowance {
+  id              Int           @id @default(autoincrement())
+  allowanceType   AllowanceType @relation(fields: [allowanceTypeId], references: [id])
+  allowanceTypeId Int           @map("allowance_type_id")
+  amount          Int
+  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id])
+  payrollItemId   Int           @map("payroll_item_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@unique([payrollItemId, allowanceTypeId])
+  @@map("allowances")
+}
