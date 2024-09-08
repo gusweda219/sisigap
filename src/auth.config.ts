@@ -16,7 +16,7 @@ export const authConfig = {
       if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false;
-      } else if (isLoggedIn) {
+      } else if (isLoggedIn || nextUrl.pathname === "/") {
         return Response.redirect(new URL("/data-pegawai", nextUrl));
       }
       return true;
