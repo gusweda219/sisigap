@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatToRupiah(value: number): string {
   const formatter = new Intl.NumberFormat("id-ID", {
-    style: "decimal",
+    style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
   });

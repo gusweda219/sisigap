@@ -12,6 +12,7 @@ import {
   ViewActionButton,
 } from "./Buttons";
 import { deleteDeductionType, deletePayroll, sendEmail } from "@/lib/actions";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Payroll>[] = [
   {
@@ -40,7 +41,16 @@ export const columns: ColumnDef<Payroll>[] = [
         <ActionButtonsWrapper>
           <ViewActionButton href={`/slip-gaji/${row.original.id}`} />
           <EditActionButton href={`/slip-gaji/${row.original.id}/edit`} />
-          <SendEmailActionButton onSend={() => sendEmail(row.original.id)} />
+          <SendEmailActionButton
+            onSend={async () => {
+              const { error } = (await sendEmail(row.original.id)) || {};
+              if (!error) {
+                toast.success("Kirim email berhasil dilakukan.");
+              } else {
+                toast.error(error);
+              }
+            }}
+          />
           <RemoveActionButton onRemove={() => deletePayroll(row.original.id)} />
         </ActionButtonsWrapper>
       );
