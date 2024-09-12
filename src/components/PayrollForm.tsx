@@ -156,11 +156,19 @@ export const PayrollForm = ({
   const onSubmit = async (values: z.infer<typeof payrollFormSchema>) => {
     try {
       if (mode === "create") {
-        await createPayroll(values);
-        toast.success("Tambah berhasil dilakukan.");
+        const { error } = (await createPayroll(values)) || {};
+        if (!error) {
+          toast.success("Tambah berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       } else if (mode === "edit") {
-        await updatePayroll(payroll.id, values);
-        toast.success("Edit berhasil dilakukan.");
+        const { error } = (await updatePayroll(payroll.id, values)) || {};
+        if (!error) {
+          toast.success("Edit berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {

@@ -47,11 +47,20 @@ export const AllowanceTypeForm = ({
   const onSubmit = async (values: z.infer<typeof allowanceTypeFormSchema>) => {
     try {
       if (mode === "create") {
-        await createAllowanceType(values);
-        toast.success("Tambah berhasil dilakukan.");
+        const { error } = (await createAllowanceType(values)) || {};
+        if (!error) {
+          toast.success("Tambah berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       } else if (mode === "edit") {
-        await updateAllowanceType(allowanceType.id, values);
-        toast.success("Edit berhasil dilakukan.");
+        const { error } =
+          (await updateAllowanceType(allowanceType.id, values)) || {};
+        if (!error) {
+          toast.success("Edit berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {

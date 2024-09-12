@@ -1,11 +1,12 @@
 "use client";
 
-import { AllowanceType, DeductionType, Employee } from "@/lib/definitions";
+import { AllowanceType, DeductionType } from "@/lib/definitions";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { Input } from "./ui/input";
 import { useEffect, useState } from "react";
 import { formatToRupiah } from "@/lib/utils";
+import { Employee } from "@prisma/client";
 
 export type MyType = {
   employee: Employee;

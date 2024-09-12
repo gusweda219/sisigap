@@ -48,11 +48,20 @@ export const DeductionTypeForm = ({
   const onSubmit = async (values: z.infer<typeof deductionTypeFormSchema>) => {
     try {
       if (mode === "create") {
-        await createDeductionType(values);
-        toast.success("Tambah berhasil dilakukan.");
+        const { error } = (await createDeductionType(values)) || {};
+        if (!error) {
+          toast.success("Tambah berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       } else if (mode === "edit") {
-        await updateDeductionType(deductionType.id, values);
-        toast.success("Edit berhasil dilakukan.");
+        const { error } =
+          (await updateDeductionType(deductionType.id, values)) || {};
+        if (!error) {
+          toast.success("Edit berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
