@@ -33,9 +33,14 @@ export const payrollFormSchema = z.object({
   payrollItems: z.array(
     z.object({
       employeeId: z.number(),
-      salary: z.number(),
-      deductions: z.array(
+      centralDeductions: z.array(
         z.object({ deductionTypeId: z.number(), amount: z.number() })
+      ),
+      notCentralDeductions: z.array(
+        z.object({ deductionTypeId: z.number(), amount: z.number() })
+      ),
+      allowances: z.array(
+        z.object({ allowanceTypeId: z.number(), amount: z.number() })
       ),
     })
   ),

@@ -6,6 +6,7 @@ import {
   deductionTypeFormSchema,
   employeeFormSchema,
   loginFormSchema,
+  payrollFormSchema,
 } from "./schemas";
 import { AuthError } from "next-auth";
 import { z } from "zod";
@@ -242,4 +243,249 @@ export async function deleteDeductionType(id: number) {
   }
 
   revalidatePath("/data-potongan");
+}
+
+export const createPayroll = async (
+  values: z.infer<typeof payrollFormSchema>
+) => {
+  try {
+    const employees = await prisma.employee.findMany({
+      where: {
+        id: {
+          in: values.payrollItems.map((payrollItem) => payrollItem.employeeId),
+        },
+      },
+    });
+
+    if (employees.length !== values.payrollItems.length) {
+      return {
+        error: "Data pegawai tidak sama.",
+      };
+    }
+
+    await prisma.payroll.create({
+      data: {
+        month: values.month,
+        year: values.year,
+        payrollItems: {
+          create: values.payrollItems.map((payrollItem) => {
+            const basicSalary =
+              employees.find(
+                (employee) => employee.id === payrollItem.employeeId
+              )?.basicSalary ?? 0;
+            const allowanceAmount = payrollItem.allowances.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            );
+            const centralDeductionAmount = payrollItem.centralDeductions.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            );
+            const notCentralDeductionAmount =
+              payrollItem.notCentralDeductions.reduce(
+                (acc, curr) => acc + curr.amount,
+                0
+              );
+            const deductionAmount =
+              centralDeductionAmount + notCentralDeductionAmount;
+            const adjustedBasicSalary =
+              basicSalary - centralDeductionAmount + allowanceAmount;
+            const netSalary = adjustedBasicSalary - notCentralDeductionAmount;
+
+            return {
+              basicSalary,
+              adjustedBasicSalary,
+              netSalary,
+              allowanceAmount,
+              centralDeductionAmount,
+              notCentralDeductionAmount,
+              deductionAmount,
+              employee: {
+                connect: {
+                  id: payrollItem.employeeId,
+                },
+              },
+              allowances: {
+                create: payrollItem.allowances.map((allowance) => ({
+                  allowanceType: {
+                    connect: {
+                      id: allowance.allowanceTypeId,
+                    },
+                  },
+                  amount: allowance.amount,
+                })),
+              },
+              deductions: {
+                create: [
+                  ...payrollItem.centralDeductions,
+                  ...payrollItem.notCentralDeductions,
+                ].map((deduction) => ({
+                  deductionType: {
+                    connect: {
+                      id: deduction.deductionTypeId,
+                    },
+                  },
+                  amount: deduction.amount,
+                })),
+              },
+            };
+          }),
+        },
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Terjadi kesalahan.",
+    };
+  }
+
+  redirect("/slip-gaji");
+};
+
+export const updatePayroll = async (
+  id: number,
+  values: z.infer<typeof payrollFormSchema>
+) => {
+  try {
+    const payroll = await prisma.payroll.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        payrollItems: {
+          include: {
+            employee: true,
+            deductions: {
+              include: {
+                deductionType: true,
+              },
+            },
+            allowances: {
+              include: {
+                allowanceType: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!payroll)
+      return {
+        error: "Slip gaji tidak ditemukan.",
+      };
+
+    await prisma.payroll.update({
+      where: {
+        id,
+      },
+      data: {
+        month: values.month,
+        year: values.year,
+        payrollItems: {
+          deleteMany: {},
+          create: values.payrollItems.map((payrollItem) => {
+            const basicSalary =
+              payroll.payrollItems.find(
+                (p) => p.employeeId === payrollItem.employeeId
+              )?.basicSalary ?? 0;
+            const allowanceAmount = payrollItem.allowances.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            );
+            const centralDeductionAmount = payrollItem.centralDeductions.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            );
+            const notCentralDeductionAmount =
+              payrollItem.notCentralDeductions.reduce(
+                (acc, curr) => acc + curr.amount,
+                0
+              );
+            const deductionAmount =
+              centralDeductionAmount + notCentralDeductionAmount;
+            const adjustedBasicSalary =
+              basicSalary - centralDeductionAmount + allowanceAmount;
+            const netSalary = adjustedBasicSalary - notCentralDeductionAmount;
+
+            return {
+              basicSalary,
+              adjustedBasicSalary,
+              netSalary,
+              allowanceAmount,
+              centralDeductionAmount,
+              notCentralDeductionAmount,
+              deductionAmount,
+              employee: {
+                connect: {
+                  id: payrollItem.employeeId,
+                },
+              },
+              allowances: {
+                create: payrollItem.allowances.map((allowance) => ({
+                  allowanceType: {
+                    connect: {
+                      id: allowance.allowanceTypeId,
+                    },
+                  },
+                  amount: allowance.amount,
+                })),
+              },
+              deductions: {
+                create: [
+                  ...payrollItem.centralDeductions,
+                  ...payrollItem.notCentralDeductions,
+                ].map((deduction) => ({
+                  deductionType: {
+                    connect: {
+                      id: deduction.deductionTypeId,
+                    },
+                  },
+                  amount: deduction.amount,
+                })),
+              },
+            };
+          }),
+        },
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Terjadi kesalahan.",
+    };
+  }
+
+  redirect("/slip-gaji");
+};
+
+export async function deletePayroll(id: number) {
+  try {
+    await prisma.payroll.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Terjadi Kesalahan",
+    };
+  }
+
+  revalidatePath("/slip-gaji");
+}
+
+export async function sendEmail(id: number) {
+  try {
+    await prisma.payroll.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Terjadi Kesalahan",
+    };
+  }
+
+  revalidatePath("/slip-gaji");
 }

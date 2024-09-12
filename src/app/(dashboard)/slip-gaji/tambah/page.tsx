@@ -1,13 +1,20 @@
 import { PayrollForm } from "@/components/PayrollForm";
 import { Wrapper } from "@/components/Wrapper";
-import { getAllowanceTypes, getDeductionTypes, getEmployees } from "@/lib/data";
+import {
+  getAllowanceTypes,
+  getDeductionTypes,
+  getEmployees,
+  getLastPayroll,
+} from "@/lib/data";
 
 const AddPayrollPage = async () => {
-  const [employees, allowanceTypes, deductionTypes] = await Promise.all([
-    getEmployees(),
-    getAllowanceTypes(),
-    getDeductionTypes(),
-  ]);
+  const [employees, allowanceTypes, deductionTypes, lastPayroll] =
+    await Promise.all([
+      getEmployees(),
+      getAllowanceTypes(),
+      getDeductionTypes(),
+      getLastPayroll(),
+    ]);
 
   return (
     <Wrapper>
@@ -16,6 +23,7 @@ const AddPayrollPage = async () => {
         employees={employees}
         allowanceTypes={allowanceTypes}
         deductionTypes={deductionTypes}
+        payroll={lastPayroll}
       />
     </Wrapper>
   );

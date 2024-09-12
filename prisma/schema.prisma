@@ -63,20 +63,22 @@ model Payroll {
 }
 
 model PayrollItem {
-  id                  Int         @id @default(autoincrement())
-  payroll             Payroll     @relation(fields: [payrollId], references: [id])
-  payrollId           Int         @map("payroll_id")
-  employee            Employee    @relation(fields: [employeeId], references: [id])
-  employeeId          Int         @map("employee_id")
-  basicSalary         Int         @map("basic_salary")
-  adjustedBasicSalary Int         @map("adjusted_basic_salary")
-  netSalary           Int         @map("net_salary")
-  deductions          Deduction[]
-  deductionAmount     Int         @map("deduction_amount")
-  allowances          Allowance[]
-  allowanceAmount     Int         @map("allowance_amount")
-  createdAt           DateTime    @default(now()) @map("created_at")
-  updatedAt           DateTime    @updatedAt @map("updated_at")
+  id                        Int         @id @default(autoincrement())
+  payroll                   Payroll     @relation(fields: [payrollId], references: [id], onDelete: Cascade)
+  payrollId                 Int         @map("payroll_id")
+  employee                  Employee    @relation(fields: [employeeId], references: [id])
+  employeeId                Int         @map("employee_id")
+  basicSalary               Int         @map("basic_salary")
+  adjustedBasicSalary       Int         @map("adjusted_basic_salary")
+  netSalary                 Int         @map("net_salary")
+  deductions                Deduction[]
+  deductionAmount           Int         @map("deduction_amount")
+  centralDeductionAmount    Int         @map("central_deduction_amount")
+  notCentralDeductionAmount Int         @map("not_central_deduction_amount")
+  allowances                Allowance[]
+  allowanceAmount           Int         @map("allowance_amount")
+  createdAt                 DateTime    @default(now()) @map("created_at")
+  updatedAt                 DateTime    @updatedAt @map("updated_at")
 
   @@map("payroll_items")
 }
@@ -86,7 +88,7 @@ model Deduction {
   deductionType   DeductionType @relation(fields: [deductionTypeId], references: [id])
   deductionTypeId Int           @map("deduction_type_id")
   amount          Int
-  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id])
+  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id], onDelete: Cascade)
   payrollItemId   Int           @map("payroll_item_id")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
@@ -112,7 +114,7 @@ model Allowance {
   allowanceType   AllowanceType @relation(fields: [allowanceTypeId], references: [id])
   allowanceTypeId Int           @map("allowance_type_id")
   amount          Int
-  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id])
+  payrollItem     PayrollItem   @relation(fields: [payrollItemId], references: [id], onDelete: Cascade)
   payrollItemId   Int           @map("payroll_item_id")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")

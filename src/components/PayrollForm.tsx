@@ -12,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
   AllowanceType,
@@ -20,7 +19,6 @@ import {
   Employee,
   Payroll,
 } from "@/lib/definitions";
-import { Label } from "./ui/label";
 import { columns, MyType } from "./PayrollFormColumns";
 import { useEffect, useState } from "react";
 import { DataTableForm } from "./DataTableForm";
@@ -33,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { months } from "@/lib/constants";
+import { createPayroll, updatePayroll } from "@/lib/actions";
 
 type PayrollFormProps =
   | {
@@ -40,7 +39,7 @@ type PayrollFormProps =
       employees: Employee[];
       deductionTypes: DeductionType[];
       allowanceTypes: AllowanceType[];
-      payroll?: Payroll;
+      payroll?: Payroll | null;
     }
   | {
       mode: "edit";
@@ -51,7 +50,7 @@ type PayrollFormProps =
     }
   | {
       mode: "view";
-      employees: Employee[];
+      employees?: Employee[];
       deductionTypes: DeductionType[];
       allowanceTypes: AllowanceType[];
       payroll: Payroll;
@@ -81,16 +80,56 @@ export const PayrollForm = ({
   });
 
   const [itemTable, setItemTable] = useState<MyType[]>(
-    mode === "create"
+    mode === "create" && !payroll
       ? employees.map((employee) => ({
           employee: employee,
-          salary: employee.basicSalary,
-          deductions: deductionTypes.map((deductionType) => ({
-            deductionType,
+          basicSalary: employee.basicSalary,
+          centralDeductions: deductionTypes
+            .filter((deductionType) => deductionType.isCentral)
+            .map((deductionType) => ({
+              deductionType,
+              amount: 0,
+            })),
+          notCentralDeductions: deductionTypes
+            .filter((deductionType) => !deductionType.isCentral)
+            .map((deductionType) => ({
+              deductionType,
+              amount: 0,
+            })),
+          allowances: allowanceTypes.map((allowanceType) => ({
+            allowanceType,
             amount: 0,
           })),
         }))
-      : []
+      : payroll!.payrollItems.map((payrollItem) => ({
+          employee: payrollItem.employee,
+          basicSalary: payrollItem.employee.basicSalary,
+          centralDeductions: deductionTypes
+            .filter((deductionType) => deductionType.isCentral)
+            .map((deductionType) => ({
+              deductionType,
+              amount:
+                payrollItem.deductions.find(
+                  (deduction) => deduction.deductionTypeId === deductionType.id
+                )?.amount ?? 0,
+            })),
+          notCentralDeductions: deductionTypes
+            .filter((deductionType) => !deductionType.isCentral)
+            .map((deductionType) => ({
+              deductionType,
+              amount:
+                payrollItem.deductions.find(
+                  (deduction) => deduction.deductionTypeId === deductionType.id
+                )?.amount ?? 0,
+            })),
+          allowances: allowanceTypes.map((allowanceType) => ({
+            allowanceType,
+            amount:
+              payrollItem.allowances.find(
+                (allowance) => allowance.allowanceTypeId === allowanceType.id
+              )?.amount ?? 0,
+          })),
+        }))
   );
 
   useEffect(() => {
@@ -98,28 +137,36 @@ export const PayrollForm = ({
       "payrollItems",
       itemTable.map((e) => ({
         employeeId: e.employee.id,
-        salary: e.salary,
-        deductions: e.deductions.map((e2) => ({
-          deductionTypeId: e2.deductionType.id,
-          amount: e2.amount,
+        allowances: e.allowances.map((allowance) => ({
+          allowanceTypeId: allowance.allowanceType.id,
+          amount: allowance.amount,
+        })),
+        centralDeductions: e.centralDeductions.map((deduction) => ({
+          deductionTypeId: deduction.deductionType.id,
+          amount: deduction.amount,
+        })),
+        notCentralDeductions: e.notCentralDeductions.map((deduction) => ({
+          deductionTypeId: deduction.deductionType.id,
+          amount: deduction.amount,
         })),
       }))
     );
   }, [itemTable]);
 
   const onSubmit = async (values: z.infer<typeof payrollFormSchema>) => {
-    // try {
-    //   if (mode === "create") {
-    //     await createPayroll(values);
-    //     toast.success("Tambah berhasil dilakukan.");
-    //   } else if (mode === "edit") {
-    //     toast.success("Edit berhasil dilakukan.");
-    //   }
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     toast.error(error.message);
-    //   }
-    // }
+    try {
+      if (mode === "create") {
+        await createPayroll(values);
+        toast.success("Tambah berhasil dilakukan.");
+      } else if (mode === "edit") {
+        await updatePayroll(payroll.id, values);
+        toast.success("Edit berhasil dilakukan.");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
   };
 
   return (
@@ -135,8 +182,9 @@ export const PayrollForm = ({
             <FormItem>
               <FormLabel>Tahun</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={(value) => form.setValue("year", Number(value))}
                 defaultValue={`${field.value}`}
+                disabled={mode === "view"}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -165,8 +213,9 @@ export const PayrollForm = ({
             <FormItem>
               <FormLabel>Bulan</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={(value) => form.setValue("month", Number(value))}
                 defaultValue={`${field.value}`}
+                disabled={mode === "view"}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -190,6 +239,7 @@ export const PayrollForm = ({
             allowanceTypes,
             centralDeductionTypes,
             notCentralDeductionTypes,
+            viewOnly: mode === "view",
           })}
           data={itemTable}
           onChange={(data) => setItemTable(data)}

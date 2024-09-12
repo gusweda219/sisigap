@@ -49,7 +49,6 @@ export function DataTableForm<TData, TValue>({
       updateData: (rowIndex, columnId, value) => {
         const newData = data.map((row, index) => {
           if (index === rowIndex) {
-            console.log(index, columnId, value);
             return {
               ...data[rowIndex]!,
               [columnId]: value,
@@ -59,7 +58,6 @@ export function DataTableForm<TData, TValue>({
           return row;
         });
 
-        console.log(newData);
         onChange?.(newData);
       },
       removeRow(rowIndex) {
@@ -77,7 +75,14 @@ export function DataTableForm<TData, TValue>({
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
               return (
-                <TableHead key={header.id} className="border">
+                <TableHead
+                  key={header.id}
+                  className="border"
+                  style={{
+                    minWidth: header.column.columnDef.size,
+                    maxWidth: header.column.columnDef.size,
+                  }}
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -103,6 +108,10 @@ export function DataTableForm<TData, TValue>({
                       ...hasMeta.getCellContext(cell.getContext()),
                     })}
                     className="border"
+                    style={{
+                      minWidth: cell.column.columnDef.size,
+                      maxWidth: cell.column.columnDef.size,
+                    }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>

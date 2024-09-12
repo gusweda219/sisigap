@@ -52,6 +52,11 @@ export const getPayrolls = async () => {
   const payrolls = await prisma.payroll.findMany({
     include: {
       payrollItems: {
+        orderBy: {
+          employee: {
+            createdAt: "asc",
+          },
+        },
         include: {
           employee: true,
           deductions: {
@@ -70,4 +75,76 @@ export const getPayrolls = async () => {
   });
 
   return payrolls;
+};
+
+export const getPayrollById = async (id: number) => {
+  const payroll = await prisma.payroll.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      payrollItems: {
+        orderBy: {
+          employee: {
+            createdAt: "asc",
+          },
+        },
+        include: {
+          employee: true,
+          deductions: {
+            include: {
+              deductionType: true,
+            },
+          },
+          allowances: {
+            include: {
+              allowanceType: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return payroll;
+};
+
+export const getLastPayroll = async () => {
+  const payroll = await prisma.payroll.findFirst({
+    orderBy: [
+      {
+        year: "desc",
+      },
+      {
+        month: "desc",
+      },
+      {
+        createdAt: "desc",
+      },
+    ],
+    include: {
+      payrollItems: {
+        orderBy: {
+          employee: {
+            createdAt: "asc",
+          },
+        },
+        include: {
+          employee: true,
+          deductions: {
+            include: {
+              deductionType: true,
+            },
+          },
+          allowances: {
+            include: {
+              allowanceType: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return payroll;
 };
