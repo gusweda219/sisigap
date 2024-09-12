@@ -1,7 +1,11 @@
 import prisma from "./db";
 
 export const getEmployees = async () => {
-  const employees = await prisma.employee.findMany();
+  const employees = await prisma.employee.findMany({
+    include: {
+      _count: true,
+    },
+  });
 
   return employees;
 };
@@ -11,13 +15,20 @@ export const getEmployeeById = async (id: number) => {
     where: {
       id,
     },
+    include: {
+      _count: true,
+    },
   });
 
   return employee;
 };
 
 export const getAllowanceTypes = async () => {
-  const allowanceTypes = await prisma.allowanceType.findMany();
+  const allowanceTypes = await prisma.allowanceType.findMany({
+    include: {
+      _count: true,
+    },
+  });
 
   return allowanceTypes;
 };
@@ -27,13 +38,20 @@ export const getAllowanceTypeById = async (id: number) => {
     where: {
       id,
     },
+    include: {
+      _count: true,
+    },
   });
 
   return allowanceType;
 };
 
 export const getDeductionTypes = async () => {
-  const deductionTypes = await prisma.deductionType.findMany();
+  const deductionTypes = await prisma.deductionType.findMany({
+    include: {
+      _count: true,
+    },
+  });
 
   return deductionTypes;
 };
@@ -42,6 +60,9 @@ export const getDeductionTypeById = async (id: number) => {
   const deductionType = await prisma.deductionType.findUnique({
     where: {
       id,
+    },
+    include: {
+      _count: true,
     },
   });
 

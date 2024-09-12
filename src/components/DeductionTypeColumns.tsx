@@ -37,9 +37,11 @@ export const columns: ColumnDef<DeductionType>[] = [
         <ActionButtonsWrapper>
           <ViewActionButton href={`/data-potongan/${row.original.id}`} />
           <EditActionButton href={`/data-potongan/${row.original.id}/edit`} />
-          <RemoveActionButton
-            onRemove={() => deleteDeductionType(row.original.id)}
-          />
+          {!row.original._count.deductions && (
+            <RemoveActionButton
+              onRemove={() => deleteDeductionType(row.original.id)}
+            />
+          )}
         </ActionButtonsWrapper>
       );
     },

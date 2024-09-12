@@ -55,9 +55,11 @@ export const columns: ColumnDef<Employee>[] = [
         <ActionButtonsWrapper>
           <ViewActionButton href={`/data-pegawai/${row.original.id}`} />
           <EditActionButton href={`/data-pegawai/${row.original.id}/edit`} />
-          <RemoveActionButton
-            onRemove={() => deleteEmployee(row.original.id)}
-          />
+          {!row.original._count.payrollItems && (
+            <RemoveActionButton
+              onRemove={() => deleteEmployee(row.original.id)}
+            />
+          )}
         </ActionButtonsWrapper>
       );
     },

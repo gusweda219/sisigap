@@ -6,11 +6,23 @@ export type User = Prisma.UserGetPayload<{
   };
 }>;
 
-export type Employee = Prisma.EmployeeGetPayload<{}>;
+export type Employee = Prisma.EmployeeGetPayload<{
+  include: {
+    _count: true;
+  };
+}>;
 
-export type AllowanceType = Prisma.AllowanceTypeGetPayload<{}>;
+export type AllowanceType = Prisma.AllowanceTypeGetPayload<{
+  include: {
+    _count: true;
+  };
+}>;
 
-export type DeductionType = Prisma.DeductionTypeGetPayload<{}>;
+export type DeductionType = Prisma.DeductionTypeGetPayload<{
+  include: {
+    _count: true;
+  };
+}>;
 
 export type Payroll = Prisma.PayrollGetPayload<{
   include: {

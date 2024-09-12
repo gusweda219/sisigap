@@ -37,9 +37,11 @@ export const columns: ColumnDef<AllowanceType>[] = [
         <ActionButtonsWrapper>
           <ViewActionButton href={`/data-tunjangan/${row.original.id}`} />
           <EditActionButton href={`/data-tunjangan/${row.original.id}/edit`} />
-          <RemoveActionButton
-            onRemove={() => deleteAllowanceType(row.original.id)}
-          />
+          {!row.original._count.allowances && (
+            <RemoveActionButton
+              onRemove={() => deleteAllowanceType(row.original.id)}
+            />
+          )}
         </ActionButtonsWrapper>
       );
     },
