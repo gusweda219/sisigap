@@ -68,7 +68,9 @@ export const LoginForm = () => {
               </FormItem>
             )}
           />
-          <Button>Login</Button>
+          <Button disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Loading..." : "Login"}
+          </Button>
         </form>
       </Form>
     </div>
