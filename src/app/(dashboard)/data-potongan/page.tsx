@@ -1,5 +1,6 @@
 import { DataTable } from "@/components/DataTable";
 import { columns } from "@/components/DeductionTypeColumns";
+import { Drawer } from "@/components/Drawer";
 import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/Wrapper";
 import { getDeductionTypes } from "@/lib/data";
@@ -12,7 +13,10 @@ const DeductionTypePage = async () => {
   return (
     <div className="space-y-4">
       <Wrapper className="flex items-center justify-between">
-        <h5 className="text-xl font-semibold">Jenis Potongan</h5>
+        <div className="flex gap-2">
+          <Drawer />
+          <h5 className="text-xl font-semibold">Jenis Potongan</h5>
+        </div>
         <Link href="/data-potongan/tambah">
           <Button size="icon">
             <Plus />

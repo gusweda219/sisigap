@@ -1,4 +1,5 @@
 import { DataTable } from "@/components/DataTable";
+import { Drawer } from "@/components/Drawer";
 import { columns } from "@/components/EmployeeColumns";
 import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/Wrapper";
@@ -13,7 +14,10 @@ const EmployeePage = async () => {
   return (
     <div className="space-y-4">
       <Wrapper className="flex items-center justify-between">
-        <h5 className="text-xl font-semibold">Pegawai</h5>
+        <div className="flex gap-2">
+          <Drawer />
+          <h5 className="text-xl font-semibold">Pegawai</h5>
+        </div>
         <Link href="/data-pegawai/tambah">
           <Button size="icon">
             <Plus />
