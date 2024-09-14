@@ -4,9 +4,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
-  PaginationState,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -15,7 +13,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -80,7 +77,6 @@ export function DataTableForm<TData, TValue>({
                   className="border"
                   style={{
                     minWidth: header.column.columnDef.size,
-                    maxWidth: header.column.columnDef.size,
                   }}
                 >
                   {header.isPlaceholder
@@ -110,7 +106,6 @@ export function DataTableForm<TData, TValue>({
                     className="border"
                     style={{
                       minWidth: cell.column.columnDef.size,
-                      maxWidth: cell.column.columnDef.size,
                     }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
