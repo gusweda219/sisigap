@@ -114,10 +114,11 @@ export const PayrollForm = ({
             })),
           })) ?? []),
           ...employees
-            .filter((employee) =>
-              payroll?.payrollItems.some(
-                (payrollItem) => payrollItem.employeeId !== employee.id
-              )
+            .filter(
+              (employee) =>
+                payroll?.payrollItems.some(
+                  (payrollItem) => payrollItem.employeeId !== employee.id
+                ) ?? true
             )
             .map((employee) => ({
               employee: employee,
