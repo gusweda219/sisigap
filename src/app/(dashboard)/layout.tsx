@@ -3,9 +3,11 @@ import { ReactNode } from "react";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen bg-secondary ">
       <Sidebar />
-      <div className="flex-1 overflow-hidden bg-secondary p-4">{children}</div>
+      <div className="overflow-hidden pl-[16rem]">
+        <div className="p-4">{children}</div>
+      </div>
     </div>
   );
 };
