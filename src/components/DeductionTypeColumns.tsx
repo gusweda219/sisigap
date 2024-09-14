@@ -30,6 +30,13 @@ export const columns: ColumnDef<DeductionType>[] = [
     ),
   },
   {
+    accessorKey: "isCentral",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Dari Pusat" />
+    ),
+    cell: ({ row }) => (row.original.isCentral ? "Ya" : "Tidak"),
+  },
+  {
     id: "actions",
     header: () => <div className="text-right">Aksi</div>,
     cell: ({ row }) => {

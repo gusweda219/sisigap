@@ -48,6 +48,12 @@ export const columns: ColumnDef<Employee>[] = [
     ),
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+  },
+  {
     id: "actions",
     header: () => <div className="text-right">Aksi</div>,
     cell: ({ row }) => {

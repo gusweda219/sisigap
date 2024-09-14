@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Employee } from "@/lib/definitions";
 import { createEmployee, updateEmployee } from "@/lib/actions";
 import { employeeFormSchema } from "@/lib/schemas";
+import { Switch } from "@/components/ui/switch";
 
 type EmployeeFormProps =
   | {
@@ -169,6 +170,24 @@ export const EmployeeForm = ({ mode, employee }: EmployeeFormProps) => {
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Switch
+                  checked={field.value === "ACTIVE"}
+                  onCheckedChange={(checked) =>
+                    form.setValue("status", checked ? "ACTIVE" : "INACTIVE")
+                  }
+                  disabled={mode === "view"}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

@@ -10,7 +10,7 @@ import {
 const AddPayrollPage = async () => {
   const [employees, allowanceTypes, deductionTypes, lastPayroll] =
     await Promise.all([
-      getEmployees(),
+      getEmployees({ status: "ACTIVE" }),
       getAllowanceTypes(),
       getDeductionTypes(),
       getLastPayroll(),

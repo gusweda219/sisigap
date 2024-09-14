@@ -1,7 +1,13 @@
+import { Status } from "@prisma/client";
 import prisma from "./db";
 
-export const getEmployees = async () => {
+export const getEmployees = async (options: { status?: Status } = {}) => {
+  const { status } = options;
+
   const employees = await prisma.employee.findMany({
+    where: {
+      status,
+    },
     include: {
       _count: true,
     },

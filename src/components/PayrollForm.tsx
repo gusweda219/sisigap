@@ -80,28 +80,67 @@ export const PayrollForm = ({
   });
 
   const [itemTable, setItemTable] = useState<MyType[]>(
-    mode === "create" && !payroll
-      ? employees.map((employee) => ({
-          employee: employee,
-          basicSalary: employee.basicSalary,
-          centralDeductions: deductionTypes
-            .filter((deductionType) => deductionType.isCentral)
-            .map((deductionType) => ({
-              deductionType,
-              amount: 0,
+    mode === "create"
+      ? [
+          ...(payroll?.payrollItems.map((payrollItem) => ({
+            employee: payrollItem.employee,
+            basicSalary: payrollItem.employee.basicSalary,
+            centralDeductions: deductionTypes
+              .filter((deductionType) => deductionType.isCentral)
+              .map((deductionType) => ({
+                deductionType,
+                amount:
+                  payrollItem.deductions.find(
+                    (deduction) =>
+                      deduction.deductionTypeId === deductionType.id
+                  )?.amount ?? 0,
+              })),
+            notCentralDeductions: deductionTypes
+              .filter((deductionType) => !deductionType.isCentral)
+              .map((deductionType) => ({
+                deductionType,
+                amount:
+                  payrollItem.deductions.find(
+                    (deduction) =>
+                      deduction.deductionTypeId === deductionType.id
+                  )?.amount ?? 0,
+              })),
+            allowances: allowanceTypes.map((allowanceType) => ({
+              allowanceType,
+              amount:
+                payrollItem.allowances.find(
+                  (allowance) => allowance.allowanceTypeId === allowanceType.id
+                )?.amount ?? 0,
             })),
-          notCentralDeductions: deductionTypes
-            .filter((deductionType) => !deductionType.isCentral)
-            .map((deductionType) => ({
-              deductionType,
-              amount: 0,
+          })) ?? []),
+          ...employees
+            .filter((employee) =>
+              payroll?.payrollItems.some(
+                (payrollItem) => payrollItem.employeeId !== employee.id
+              )
+            )
+            .map((employee) => ({
+              employee: employee,
+              basicSalary: employee.basicSalary,
+              centralDeductions: deductionTypes
+                .filter((deductionType) => deductionType.isCentral)
+                .map((deductionType) => ({
+                  deductionType,
+                  amount: 0,
+                })),
+              notCentralDeductions: deductionTypes
+                .filter((deductionType) => !deductionType.isCentral)
+                .map((deductionType) => ({
+                  deductionType,
+                  amount: 0,
+                })),
+              allowances: allowanceTypes.map((allowanceType) => ({
+                allowanceType,
+                amount: 0,
+              })),
             })),
-          allowances: allowanceTypes.map((allowanceType) => ({
-            allowanceType,
-            amount: 0,
-          })),
-        }))
-      : payroll!.payrollItems.map((payrollItem) => ({
+        ]
+      : payroll.payrollItems.map((payrollItem) => ({
           employee: payrollItem.employee,
           basicSalary: payrollItem.employee.basicSalary,
           centralDeductions: deductionTypes

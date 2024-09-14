@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -94,39 +95,47 @@ export const DeductionTypeForm = ({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="isCentral"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Apakah dari potongan dari pusat?</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={(value) =>
-                    form.setValue("isCentral", value === "yes")
-                  }
-                  defaultValue={field.value ? "yes" : "no"}
-                  disabled={mode === "view"}
-                  className="flex flex-col"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="yes" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Ya</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="no" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Tidak</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {(mode === "create" || mode === "view") && (
+          <FormField
+            control={form.control}
+            name="isCentral"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Apakah dari potongan dari pusat?</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(value) =>
+                      form.setValue("isCentral", value === "yes")
+                    }
+                    defaultValue={field.value ? "yes" : "no"}
+                    disabled={mode === "view"}
+                    className="flex flex-col"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="yes" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Ya</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="no" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Tidak</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                {mode !== "view" && (
+                  <FormDescription>
+                    Field ini tidak dapat diedit lagi setelah disimpan. Pastikan
+                    Anda memilih dengan benar.
+                  </FormDescription>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {(mode === "create" || mode === "edit") && (
           <Button
