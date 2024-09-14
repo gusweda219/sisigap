@@ -143,7 +143,7 @@ export const PayrollForm = ({
         ]
       : payroll.payrollItems.map((payrollItem) => ({
           employee: payrollItem.employee,
-          basicSalary: payrollItem.employee.basicSalary,
+          basicSalary: payrollItem.basicSalary,
           centralDeductions: deductionTypes
             .filter((deductionType) => deductionType.isCentral)
             .map((deductionType) => ({
