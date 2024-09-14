@@ -72,6 +72,48 @@ export const columns = ({
     ),
     cell: ({ row }) => formatToRupiah(row.original.basicSalary),
   },
+  ...allowanceTypes.map<ColumnDef<MyType>>((allowanceType) => {
+    const { typeName } = allowanceType;
+
+    return {
+      id: typeName,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={typeName} />
+      ),
+      cell: function ({ row, column, table }) {
+        const value =
+          row.original.allowances.find(
+            (allowance) => allowance.allowanceType.id === allowanceType.id
+          )?.amount ?? 0;
+
+        return (
+          <InputTable
+            type="text"
+            value={formatToRupiah(value)}
+            onBlur={(e) => {
+              const inputValue = e.target.value;
+              const numericValue = parseCurrency(inputValue);
+
+              table.options.meta?.updateData?.(
+                row.index,
+                "allowances",
+                row.original.allowances.map((allowance, j) => {
+                  if (allowance.allowanceType.id === allowanceType.id) {
+                    return {
+                      ...allowance,
+                      amount: numericValue,
+                    };
+                  }
+                  return allowance;
+                })
+              );
+            }}
+            disabled={viewOnly}
+          />
+        );
+      },
+    };
+  }),
   ...centralDeductionTypes.map<ColumnDef<MyType>>((deductionType) => {
     const { typeName } = deductionType;
 
@@ -106,48 +148,6 @@ export const columns = ({
                     };
                   }
                   return centralDeduction;
-                })
-              );
-            }}
-            disabled={viewOnly}
-          />
-        );
-      },
-    };
-  }),
-  ...allowanceTypes.map<ColumnDef<MyType>>((allowanceType) => {
-    const { typeName } = allowanceType;
-
-    return {
-      id: typeName,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={typeName} />
-      ),
-      cell: function ({ row, column, table }) {
-        const value =
-          row.original.allowances.find(
-            (allowance) => allowance.allowanceType.id === allowanceType.id
-          )?.amount ?? 0;
-
-        return (
-          <InputTable
-            type="text"
-            value={formatToRupiah(value)}
-            onBlur={(e) => {
-              const inputValue = e.target.value;
-              const numericValue = parseCurrency(inputValue);
-
-              table.options.meta?.updateData?.(
-                row.index,
-                "allowances",
-                row.original.allowances.map((allowance, j) => {
-                  if (allowance.allowanceType.id === allowanceType.id) {
-                    return {
-                      ...allowance,
-                      amount: numericValue,
-                    };
-                  }
-                  return allowance;
                 })
               );
             }}
