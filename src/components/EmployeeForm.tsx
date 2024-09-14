@@ -51,11 +51,19 @@ export const EmployeeForm = ({ mode, employee }: EmployeeFormProps) => {
   const onSubmit = async (values: z.infer<typeof employeeFormSchema>) => {
     try {
       if (mode === "create") {
-        await createEmployee(values);
-        toast.success("Tambah berhasil dilakukan.");
+        const { error } = (await createEmployee(values)) || {};
+        if (!error) {
+          toast.success("Tambah berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       } else if (mode === "edit") {
-        await updateEmployee(employee.id, values);
-        toast.success("Edit berhasil dilakukan.");
+        const { error } = (await updateEmployee(employee.id, values)) || {};
+        if (!error) {
+          toast.success("Edit berhasil dilakukan.");
+        } else {
+          toast.error(error);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
