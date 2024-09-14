@@ -603,6 +603,9 @@ export async function sendEmail(id: number) {
             <p><strong>Bulan:</strong> ${months[payroll.month]} ${
           payroll.year
         }</p>
+            <p><strong>Kode Gaji Pokok:</strong> ${
+              payrollItem.employee.basicSalaryCode
+            }</p>
         </div>
         <table>
             <tr>
