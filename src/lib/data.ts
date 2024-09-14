@@ -1,7 +1,10 @@
 import { Status } from "@prisma/client";
 import prisma from "./db";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const getEmployees = async (options: { status?: Status } = {}) => {
+  noStore();
+
   const { status } = options;
 
   const employees = await prisma.employee.findMany({
@@ -17,6 +20,8 @@ export const getEmployees = async (options: { status?: Status } = {}) => {
 };
 
 export const getEmployeeById = async (id: number) => {
+  noStore();
+
   const employee = await prisma.employee.findUnique({
     where: {
       id,
@@ -30,6 +35,8 @@ export const getEmployeeById = async (id: number) => {
 };
 
 export const getAllowanceTypes = async () => {
+  noStore();
+
   const allowanceTypes = await prisma.allowanceType.findMany({
     include: {
       _count: true,
@@ -40,6 +47,8 @@ export const getAllowanceTypes = async () => {
 };
 
 export const getAllowanceTypeById = async (id: number) => {
+  noStore();
+
   const allowanceType = await prisma.allowanceType.findUnique({
     where: {
       id,
@@ -53,6 +62,8 @@ export const getAllowanceTypeById = async (id: number) => {
 };
 
 export const getDeductionTypes = async () => {
+  noStore();
+
   const deductionTypes = await prisma.deductionType.findMany({
     include: {
       _count: true,
@@ -63,6 +74,8 @@ export const getDeductionTypes = async () => {
 };
 
 export const getDeductionTypeById = async (id: number) => {
+  noStore();
+
   const deductionType = await prisma.deductionType.findUnique({
     where: {
       id,
@@ -76,6 +89,8 @@ export const getDeductionTypeById = async (id: number) => {
 };
 
 export const getPayrolls = async () => {
+  noStore();
+
   const payrolls = await prisma.payroll.findMany({
     include: {
       payrollItems: {
@@ -105,6 +120,8 @@ export const getPayrolls = async () => {
 };
 
 export const getPayrollById = async (id: number) => {
+  noStore();
+
   const payroll = await prisma.payroll.findUnique({
     where: {
       id,
@@ -137,6 +154,8 @@ export const getPayrollById = async (id: number) => {
 };
 
 export const getLastPayroll = async () => {
+  noStore();
+
   const payroll = await prisma.payroll.findFirst({
     orderBy: [
       {
