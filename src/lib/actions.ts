@@ -615,12 +615,14 @@ export async function sendEmail(id: number) {
                 <td>${formatToRupiah(payrollItem.basicSalary)}</td>
             </tr>
             <!-- Tunjangan dari Pusat -->
-            ${payrollItem.allowances.map(
-              (allowance) => `<tr>
+            ${payrollItem.allowances
+              .map(
+                (allowance) => `<tr>
                 <td>${allowance.allowanceType.typeName}</td>
                 <td>${formatToRupiah(allowance.amount)}</td>
             </tr>`
-            )}
+              )
+              .join("")}
             <tr>
                 <td class="total">Total Tunjangan dari Pusat</td>
                 <td class="total">${formatToRupiah(
@@ -635,7 +637,8 @@ export async function sendEmail(id: number) {
                 <td>${deduction.deductionType.typeName}</td>
                 <td>- ${formatToRupiah(deduction.amount)}</td>
             </tr>`
-              )}
+              )
+              .join("")}
             <tr>
                 <td class="total">Total Potongan dari Pusat</td>
                 <td class="total">- ${formatToRupiah(
@@ -657,7 +660,8 @@ export async function sendEmail(id: number) {
                 <td>${deduction.deductionType.typeName}</td>
                 <td>- ${formatToRupiah(deduction.amount)}</td>
             </tr>`
-              )}
+              )
+              .join("")}
             <tr>
                 <td class="total">Total Potongan dari Kantor</td>
                 <td class="total">- ${formatToRupiah(
