@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { Input } from "./ui/input";
 import { useEffect, useState } from "react";
-import { formatToRupiah } from "@/lib/utils";
+import { formatToRupiah, parseCurrency } from "@/lib/utils";
 import { Employee } from "@prisma/client";
 
 export type MyType = {
@@ -89,10 +89,12 @@ export const columns = ({
 
         return (
           <InputTable
-            type="number"
-            min={0}
-            value={value}
+            type="text"
+            value={formatToRupiah(value)}
             onBlur={(e) => {
+              const inputValue = e.target.value;
+              const numericValue = parseCurrency(inputValue);
+
               table.options.meta?.updateData?.(
                 row.index,
                 "centralDeductions",
@@ -100,7 +102,7 @@ export const columns = ({
                   if (centralDeduction.deductionType.id === deductionType.id) {
                     return {
                       ...centralDeduction,
-                      amount: Number(e.target.value),
+                      amount: numericValue,
                     };
                   }
                   return centralDeduction;
@@ -129,10 +131,12 @@ export const columns = ({
 
         return (
           <InputTable
-            type="number"
-            min={0}
-            value={value}
+            type="text"
+            value={formatToRupiah(value)}
             onBlur={(e) => {
+              const inputValue = e.target.value;
+              const numericValue = parseCurrency(inputValue);
+
               table.options.meta?.updateData?.(
                 row.index,
                 "allowances",
@@ -140,7 +144,7 @@ export const columns = ({
                   if (allowance.allowanceType.id === allowanceType.id) {
                     return {
                       ...allowance,
-                      amount: Number(e.target.value),
+                      amount: numericValue,
                     };
                   }
                   return allowance;
@@ -185,10 +189,12 @@ export const columns = ({
 
         return (
           <InputTable
-            type="number"
-            min={0}
-            value={value}
+            type="text"
+            value={formatToRupiah(value)}
             onBlur={(e) => {
+              const inputValue = e.target.value;
+              const numericValue = parseCurrency(inputValue);
+
               table.options.meta?.updateData?.(
                 row.index,
                 "notCentralDeductions",
@@ -198,7 +204,7 @@ export const columns = ({
                   ) {
                     return {
                       ...notCentraldeduction,
-                      amount: Number(e.target.value),
+                      amount: numericValue,
                     };
                   }
                   return notCentraldeduction;
@@ -248,7 +254,10 @@ export const InputTable = ({
       value={value}
       onChange={(e) => {
         e.target.focus();
-        setValue(e.target.value);
+        const inputValue = e.target.value;
+        const numericValue = parseCurrency(inputValue);
+
+        setValue(formatToRupiah(numericValue));
       }}
       onKeyDown={(e) => {
         if (e.key === ",") {

@@ -18,6 +18,7 @@ import { Employee } from "@/lib/definitions";
 import { createEmployee, updateEmployee } from "@/lib/actions";
 import { employeeFormSchema } from "@/lib/schemas";
 import { Switch } from "@/components/ui/switch";
+import { formatToRupiah, parseCurrency } from "@/lib/utils";
 
 type EmployeeFormProps =
   | {
@@ -41,7 +42,7 @@ export const EmployeeForm = ({ mode, employee }: EmployeeFormProps) => {
       name: employee?.name ?? "",
       email: employee?.email ?? "",
       backAccountNumber: employee?.backAccountNumber ?? "",
-      basicSalary: employee?.basicSalary,
+      basicSalary: employee?.basicSalary ?? 0,
       basicSalaryCode: employee?.basicSalaryCode ?? "",
       status: employee?.status ?? "ACTIVE",
     },
@@ -130,8 +131,14 @@ export const EmployeeForm = ({ mode, employee }: EmployeeFormProps) => {
               <FormControl>
                 <Input
                   placeholder="Masukkan Gaji Pokok"
-                  type="number"
-                  {...field}
+                  type="text"
+                  value={formatToRupiah(field.value)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    const numericValue = parseCurrency(inputValue);
+
+                    field.onChange(numericValue);
+                  }}
                   disabled={mode === "view"}
                 />
               </FormControl>

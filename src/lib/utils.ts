@@ -14,3 +14,8 @@ export function formatToRupiah(value: number): string {
 
   return formatter.format(value);
 }
+
+export function parseCurrency(value: string): number {
+  const cleanedValue = value.replace(/[^0-9]/g, "");
+  return parseFloat(cleanedValue) || 0;
+}
