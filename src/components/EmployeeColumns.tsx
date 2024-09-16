@@ -10,6 +10,7 @@ import {
   ViewActionButton,
 } from "./Buttons";
 import { deleteEmployee } from "@/lib/actions";
+import { Badge } from "./ui/badge";
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -51,6 +52,13 @@ export const columns: ColumnDef<Employee>[] = [
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => (
+      <Badge
+        variant={row.original.status === "ACTIVE" ? "default" : "destructive"}
+      >
+        {row.original.status.toLowerCase()}
+      </Badge>
     ),
   },
   {
