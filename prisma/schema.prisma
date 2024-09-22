@@ -13,6 +13,11 @@ enum Status {
   INACTIVE
 }
 
+enum ShipmentStatus {
+  SENT
+  NOT_SENT
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -52,12 +57,13 @@ model DeductionType {
 }
 
 model Payroll {
-  id           Int           @id @default(autoincrement())
-  month        Int
-  year         Int
-  payrollItems PayrollItem[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id             Int            @id @default(autoincrement())
+  month          Int
+  year           Int
+  payrollItems   PayrollItem[]
+  shipmentStatus ShipmentStatus @default(NOT_SENT) @map("shipment_status")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
 
   @@map("payrolls")
 }

@@ -41,7 +41,9 @@ export const columns: ColumnDef<Payroll>[] = [
       return (
         <ActionButtonsWrapper>
           <ViewActionButton href={`/slip-gaji/${row.original.id}`} />
-          <EditActionButton href={`/slip-gaji/${row.original.id}/edit`} />
+          {row.original.shipmentStatus !== "SENT" && (
+            <EditActionButton href={`/slip-gaji/${row.original.id}/edit`} />
+          )}
           <ExportExcellActionButton
             onExport={async () => {
               const res = await fetch(`/api/export-excell/${row.original.id}`);

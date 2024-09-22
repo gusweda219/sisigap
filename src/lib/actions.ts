@@ -70,24 +70,59 @@ export const updateEmployee = async (
   values: z.infer<typeof employeeFormSchema>
 ) => {
   try {
-    const user = await prisma.employee.findUnique({
+    const employee = await prisma.employee.findUnique({
       where: {
         id,
       },
     });
 
-    if (!user)
+    if (!employee)
       return {
         error: "Pegawai tidak ditemukan.",
       };
 
-    await prisma.employee.update({
-      where: {
-        id,
-      },
-      data: {
-        ...values,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.employee.update({
+        where: {
+          id,
+        },
+        data: {
+          ...values,
+        },
+      });
+
+      if (employee.basicSalary !== values.basicSalary) {
+        const payrollItems = await tx.payrollItem.findMany({
+          where: {
+            payroll: {
+              shipmentStatus: "NOT_SENT",
+            },
+            employeeId: id,
+          },
+        });
+
+        for (let payrollItem of payrollItems) {
+          const basicSalary = values.basicSalary;
+
+          const adjustedBasicSalary =
+            basicSalary -
+            payrollItem.centralDeductionAmount +
+            payrollItem.allowanceAmount;
+          const netSalary =
+            adjustedBasicSalary - payrollItem.notCentralDeductionAmount;
+
+          await tx.payrollItem.update({
+            where: {
+              id: payrollItem.id,
+            },
+            data: {
+              basicSalary,
+              adjustedBasicSalary,
+              netSalary,
+            },
+          });
+        }
+      }
     });
   } catch (error) {
     return {
@@ -686,6 +721,17 @@ export async function sendEmail(id: number) {
         `,
       });
     }
+
+    await prisma.payroll.update({
+      where: {
+        id,
+      },
+      data: {
+        shipmentStatus: "SENT",
+      },
+    });
+
+    revalidatePath("/slip-gaji");
   } catch (error) {
     return {
       error: "Terjadi Kesalahan",

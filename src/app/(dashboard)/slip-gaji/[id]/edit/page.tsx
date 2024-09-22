@@ -5,7 +5,7 @@ import {
   getDeductionTypes,
   getPayrollById,
 } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 const EditPayroll = async ({ params }: { params: { id: string } }) => {
   const [payroll, allowanceTypes, deductionTypes] = await Promise.all([
@@ -16,6 +16,10 @@ const EditPayroll = async ({ params }: { params: { id: string } }) => {
 
   if (!payroll) {
     return notFound();
+  }
+
+  if (payroll.shipmentStatus === "SENT") {
+    return redirect("/slip-gaji");
   }
 
   return (
