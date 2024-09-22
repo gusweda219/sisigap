@@ -14,7 +14,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Eye, Pencil, Printer, Send, Trash2 } from "lucide-react";
+import {
+  Eye,
+  LucideFileBarChart,
+  Pencil,
+  Printer,
+  Send,
+  Trash2,
+} from "lucide-react";
 
 export const ViewActionButton = ({ href }: { href: string }) => {
   return (
@@ -132,6 +139,26 @@ export const SendEmailActionButton = ({ onSend }: { onSend: () => void }) => {
       </AlertDialog>
       <TooltipContent>
         <p>Send Email</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+export const ExportExcellActionButton = ({
+  onExport,
+}: {
+  onExport: () => void;
+}) => {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon" onClick={onExport}>
+          <LucideFileBarChart size={14} />
+          <span className="sr-only">Export</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Export</p>
       </TooltipContent>
     </Tooltip>
   );
