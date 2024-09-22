@@ -31,7 +31,6 @@ export const columns: ColumnDef<AllowanceType>[] = [
   },
   {
     id: "actions",
-    header: () => <div className="text-right">Aksi</div>,
     cell: ({ row }) => {
       return (
         <ActionButtonsWrapper>

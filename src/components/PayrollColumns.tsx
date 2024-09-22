@@ -36,7 +36,6 @@ export const columns: ColumnDef<Payroll>[] = [
   },
   {
     id: "actions",
-    header: () => <div className="text-right">Aksi</div>,
     cell: ({ row }) => {
       return (
         <ActionButtonsWrapper>
