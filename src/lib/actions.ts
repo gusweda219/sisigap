@@ -556,7 +556,7 @@ export async function sendEmail(id: number) {
 
     for (let payrollItem of payroll.payrollItems) {
       transporter.sendMail({
-        from: "Weda Baskara <wedabaskara219@gmail.com>",
+        from: "SISIGAP <pnsemarapurasisigap9@gmail.com>",
         to: payrollItem.employee.email,
         subject: "Slip Gaji",
         html: `
