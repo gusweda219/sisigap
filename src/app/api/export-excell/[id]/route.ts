@@ -21,6 +21,11 @@ export const GET = async (
       },
       include: {
         payrollItems: {
+          orderBy: {
+            employee: {
+              createdAt: "asc",
+            },
+          },
           include: {
             employee: true,
             deductions: {
