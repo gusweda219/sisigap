@@ -13,7 +13,14 @@ enum Status {
   INACTIVE
 }
 
-enum ShipmentStatus {
+enum PayrollStatus {
+  SENT
+  NOT_SENT
+  SENDING
+  ERROR
+}
+
+enum PayrollItemStatus {
   SENT
   NOT_SENT
 }
@@ -57,35 +64,37 @@ model DeductionType {
 }
 
 model Payroll {
-  id             Int            @id @default(autoincrement())
-  month          Int
-  year           Int
-  payrollItems   PayrollItem[]
-  shipmentStatus ShipmentStatus @default(NOT_SENT) @map("shipment_status")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
+  id           Int           @id @default(autoincrement())
+  month        Int
+  year         Int
+  payrollItems PayrollItem[]
+  status       PayrollStatus @default(NOT_SENT)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@map("payrolls")
 }
 
 model PayrollItem {
-  id                        Int         @id @default(autoincrement())
-  payroll                   Payroll     @relation(fields: [payrollId], references: [id], onDelete: Cascade)
-  payrollId                 Int         @map("payroll_id")
-  employee                  Employee    @relation(fields: [employeeId], references: [id])
-  employeeId                Int         @map("employee_id")
-  basicSalary               Int         @map("basic_salary")
-  adjustedBasicSalary       Int         @map("adjusted_basic_salary")
-  netSalary                 Int         @map("net_salary")
+  id                        Int               @id @default(autoincrement())
+  payroll                   Payroll           @relation(fields: [payrollId], references: [id], onDelete: Cascade)
+  payrollId                 Int               @map("payroll_id")
+  employee                  Employee          @relation(fields: [employeeId], references: [id])
+  employeeId                Int               @map("employee_id")
+  basicSalary               Int               @map("basic_salary")
+  adjustedBasicSalary       Int               @map("adjusted_basic_salary")
+  netSalary                 Int               @map("net_salary")
   deductions                Deduction[]
-  deductionAmount           Int         @map("deduction_amount")
-  centralDeductionAmount    Int         @map("central_deduction_amount")
-  notCentralDeductionAmount Int         @map("not_central_deduction_amount")
+  deductionAmount           Int               @map("deduction_amount")
+  centralDeductionAmount    Int               @map("central_deduction_amount")
+  notCentralDeductionAmount Int               @map("not_central_deduction_amount")
   allowances                Allowance[]
-  allowanceAmount           Int         @map("allowance_amount")
-  createdAt                 DateTime    @default(now()) @map("created_at")
-  updatedAt                 DateTime    @updatedAt @map("updated_at")
+  allowanceAmount           Int               @map("allowance_amount")
+  status                    PayrollItemStatus @default(NOT_SENT)
+  createdAt                 DateTime          @default(now()) @map("created_at")
+  updatedAt                 DateTime          @updatedAt @map("updated_at")
 
+  @@unique([payrollId, employeeId])
   @@map("payroll_items")
 }
 

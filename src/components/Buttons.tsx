@@ -22,6 +22,9 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
+import { sendEmail } from "@/lib/actions";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export const ViewActionButton = ({ href }: { href: string }) => {
   return (
@@ -110,7 +113,9 @@ export const RemoveActionButton = ({ onRemove }: { onRemove: () => void }) => {
   );
 };
 
-export const SendEmailActionButton = ({ onSend }: { onSend: () => void }) => {
+export const SendEmailActionButton = ({ id }: { id: number }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
   return (
     <Tooltip>
       <AlertDialog>
@@ -133,7 +138,26 @@ export const SendEmailActionButton = ({ onSend }: { onSend: () => void }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={onSend}>Lanjutkan</AlertDialogAction>
+            <AlertDialogAction
+              onClick={async () => {
+                if (isProcessing) {
+                  toast.error("Slip gaji sedang dikirim. Mohon menunggu.");
+                  return;
+                }
+                setIsProcessing(true);
+
+                const { error } = (await sendEmail(id)) || {};
+                if (!error) {
+                  toast.success("Kirim email berhasil dilakukan.");
+                } else {
+                  toast.error(error);
+                }
+
+                setIsProcessing(false);
+              }}
+            >
+              Lanjutkan
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

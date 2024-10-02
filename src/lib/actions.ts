@@ -15,7 +15,7 @@ import prisma from "./db";
 import { revalidatePath } from "next/cache";
 import nodemailer from "nodemailer";
 import { months } from "./constants";
-import { formatToRupiah } from "./utils";
+import { delay, formatToRupiah, getRandomNumber } from "./utils";
 
 export const login = async (values: z.infer<typeof loginFormSchema>) => {
   try {
@@ -95,7 +95,7 @@ export const updateEmployee = async (
         const payrollItems = await tx.payrollItem.findMany({
           where: {
             payroll: {
-              shipmentStatus: "NOT_SENT",
+              status: "NOT_SENT",
             },
             employeeId: id,
           },
@@ -520,6 +520,9 @@ export async function sendEmail(id: number) {
       },
       include: {
         payrollItems: {
+          where: {
+            status: "NOT_SENT",
+          },
           include: {
             employee: true,
             deductions: {
@@ -542,6 +545,27 @@ export async function sendEmail(id: number) {
         error: "Slip gaji tidak ditemukan.",
       };
     }
+
+    if (payroll.status === "SENT") {
+      return {
+        error: "Slip gaji sudah dikirim.",
+      };
+    }
+
+    if (payroll.status === "SENDING") {
+      return {
+        error: "Slip gaji sedang dikirim. Mohon menunggu.",
+      };
+    }
+
+    await prisma.payroll.update({
+      where: {
+        id,
+      },
+      data: {
+        status: "SENDING",
+      },
+    });
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -720,6 +744,18 @@ export async function sendEmail(id: number) {
 </html>
         `,
       });
+
+      await prisma.payrollItem.update({
+        where: {
+          id: payrollItem.id,
+        },
+        data: {
+          status: "SENT",
+        },
+      });
+
+      const randomNumber = getRandomNumber(5000, 10000);
+      await delay(randomNumber);
     }
 
     await prisma.payroll.update({
@@ -727,12 +763,19 @@ export async function sendEmail(id: number) {
         id,
       },
       data: {
-        shipmentStatus: "SENT",
+        status: "SENT",
       },
     });
-
     revalidatePath("/slip-gaji");
   } catch (error) {
+    await prisma.payroll.update({
+      where: {
+        id,
+      },
+      data: {
+        status: "ERROR",
+      },
+    });
     return {
       error: "Terjadi Kesalahan",
     };

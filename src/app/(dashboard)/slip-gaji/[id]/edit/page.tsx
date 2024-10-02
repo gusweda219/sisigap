@@ -18,7 +18,7 @@ const EditPayroll = async ({ params }: { params: { id: string } }) => {
     return notFound();
   }
 
-  if (payroll.shipmentStatus === "SENT") {
+  if (payroll.status !== "NOT_SENT") {
     return redirect("/slip-gaji");
   }
 
