@@ -554,173 +554,175 @@ export async function sendEmail(id: number) {
       },
     });
 
-    for (let payrollItem of payroll.payrollItems) {
-      transporter.sendMail({
-        from: "SISIGAP <pnsemarapurasisigap9@gmail.com>",
-        to: payrollItem.employee.email,
-        subject: "Slip Gaji",
-        html: `
-          <!DOCTYPE html>
+    await Promise.all(
+      payroll.payrollItems.map((payrollItem) =>
+        transporter.sendMail({
+          from: "SISIGAP <pnsemarapurasisigap9@gmail.com>",
+          to: payrollItem.employee.email,
+          subject: "Slip Gaji",
+          html: `
+        <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slip Gaji</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-        .header h2 {
-            margin: 5px 0;
-            font-size: 18px;
-            color: #666;
-        }
-        .info {
-            margin-bottom: 20px;
-        }
-        .info p {
-            margin: 5px 0;
-            font-size: 16px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .total {
-            font-weight: bold;
-            background-color: #f9f9f9;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slip Gaji</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          color: #333;
+          margin: 0;
+          padding: 0;
+          background-color: #f4f4f4;
+      }
+      .container {
+          width: 80%;
+          margin: 0 auto;
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+          text-align: center;
+          margin-bottom: 20px;
+      }
+      .header h1 {
+          margin: 0;
+          font-size: 24px;
+          color: #333;
+      }
+      .header h2 {
+          margin: 5px 0;
+          font-size: 18px;
+          color: #666;
+      }
+      .info {
+          margin-bottom: 20px;
+      }
+      .info p {
+          margin: 5px 0;
+          font-size: 16px;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+      }
+      th, td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+      }
+      th {
+          background-color: #f4f4f4;
+          color: #333;
+      }
+      .total {
+          font-weight: bold;
+          background-color: #f9f9f9;
+      }
+      .footer {
+          text-align: center;
+          margin-top: 20px;
+      }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>MAHKAMAH AGUNG RI</h1>
-            <h2>KANTOR PENGADILAN NEGERI SEMARAPURA</h2>
-        </div>
-        <div class="info">
-            <p><strong>Nama Pegawai:</strong> ${payrollItem.employee.name}</p>
-            <p><strong>Bulan:</strong> ${months[payroll.month]} ${
-          payroll.year
-        }</p>
-            <p><strong>Kode Gaji Pokok:</strong> ${
-              payrollItem.employee.basicSalaryCode
-            }</p>
-        </div>
-        <table>
-            <tr>
-                <th>Deskripsi</th>
-                <th>Jumlah</th>
-            </tr>
-            <!-- Gaji Pokok -->
-            <tr>
-                <td>Gaji Pokok</td>
-                <td>${formatToRupiah(payrollItem.basicSalary)}</td>
-            </tr>
-            <!-- Tunjangan dari Pusat -->
-            ${payrollItem.allowances
-              .map(
-                (allowance) => `<tr>
-                <td>${allowance.allowanceType.typeName}</td>
-                <td>${formatToRupiah(allowance.amount)}</td>
-            </tr>`
-              )
-              .join("")}
-            <tr>
-                <td class="total">Total Tunjangan dari Pusat</td>
-                <td class="total">${formatToRupiah(
-                  payrollItem.allowanceAmount
-                )}</td>
-            </tr>
-            <!-- Potongan dari Pusat -->
-            ${payrollItem.deductions
-              .filter((deduction) => deduction.deductionType.isCentral)
-              .map(
-                (deduction) => `<tr>
-                <td>${deduction.deductionType.typeName}</td>
-                <td>- ${formatToRupiah(deduction.amount)}</td>
-            </tr>`
-              )
-              .join("")}
-            <tr>
-                <td class="total">Total Potongan dari Pusat</td>
-                <td class="total">- ${formatToRupiah(
-                  payrollItem.centralDeductionAmount
-                )}</td>
-            </tr>
-            <!-- Total Gaji Bersih sebelum Potongan dari Kantor -->
-            <tr>
-                <td class="total">Gaji Bersih Sebelum Potongan Kantor</td>
-                <td class="total">${formatToRupiah(
-                  payrollItem.adjustedBasicSalary
-                )}</td>
-            </tr>
-            <!-- Potongan dari Kantor -->
-            ${payrollItem.deductions
-              .filter((deduction) => !deduction.deductionType.isCentral)
-              .map(
-                (deduction) => `<tr>
-                <td>${deduction.deductionType.typeName}</td>
-                <td>- ${formatToRupiah(deduction.amount)}</td>
-            </tr>`
-              )
-              .join("")}
-            <tr>
-                <td class="total">Total Potongan dari Kantor</td>
-                <td class="total">- ${formatToRupiah(
-                  payrollItem.notCentralDeductionAmount
-                )}</td>
-            </tr>
-            <!-- Gaji Bersih yang Diterima -->
-            <tr>
-                <td class="total">Gaji Bersih yang Diterima</td>
-                <td class="total">${formatToRupiah(payrollItem.netSalary)}</td>
-            </tr>
-        </table>
-        <div class="footer">
-            <p>Terima kasih atas kerja keras Anda!</p>
-        </div>
-    </div>
+  <div class="container">
+      <div class="header">
+          <h1>MAHKAMAH AGUNG RI</h1>
+          <h2>KANTOR PENGADILAN NEGERI SEMARAPURA</h2>
+      </div>
+      <div class="info">
+          <p><strong>Nama Pegawai:</strong> ${payrollItem.employee.name}</p>
+          <p><strong>Bulan:</strong> ${months[payroll.month]} ${
+            payroll.year
+          }</p>
+          <p><strong>Kode Gaji Pokok:</strong> ${
+            payrollItem.employee.basicSalaryCode
+          }</p>
+      </div>
+      <table>
+          <tr>
+              <th>Deskripsi</th>
+              <th>Jumlah</th>
+          </tr>
+          <!-- Gaji Pokok -->
+          <tr>
+              <td>Gaji Pokok</td>
+              <td>${formatToRupiah(payrollItem.basicSalary)}</td>
+          </tr>
+          <!-- Tunjangan dari Pusat -->
+          ${payrollItem.allowances
+            .map(
+              (allowance) => `<tr>
+              <td>${allowance.allowanceType.typeName}</td>
+              <td>${formatToRupiah(allowance.amount)}</td>
+          </tr>`
+            )
+            .join("")}
+          <tr>
+              <td class="total">Total Tunjangan dari Pusat</td>
+              <td class="total">${formatToRupiah(
+                payrollItem.allowanceAmount
+              )}</td>
+          </tr>
+          <!-- Potongan dari Pusat -->
+          ${payrollItem.deductions
+            .filter((deduction) => deduction.deductionType.isCentral)
+            .map(
+              (deduction) => `<tr>
+              <td>${deduction.deductionType.typeName}</td>
+              <td>- ${formatToRupiah(deduction.amount)}</td>
+          </tr>`
+            )
+            .join("")}
+          <tr>
+              <td class="total">Total Potongan dari Pusat</td>
+              <td class="total">- ${formatToRupiah(
+                payrollItem.centralDeductionAmount
+              )}</td>
+          </tr>
+          <!-- Total Gaji Bersih sebelum Potongan dari Kantor -->
+          <tr>
+              <td class="total">Gaji Bersih Sebelum Potongan Kantor</td>
+              <td class="total">${formatToRupiah(
+                payrollItem.adjustedBasicSalary
+              )}</td>
+          </tr>
+          <!-- Potongan dari Kantor -->
+          ${payrollItem.deductions
+            .filter((deduction) => !deduction.deductionType.isCentral)
+            .map(
+              (deduction) => `<tr>
+              <td>${deduction.deductionType.typeName}</td>
+              <td>- ${formatToRupiah(deduction.amount)}</td>
+          </tr>`
+            )
+            .join("")}
+          <tr>
+              <td class="total">Total Potongan dari Kantor</td>
+              <td class="total">- ${formatToRupiah(
+                payrollItem.notCentralDeductionAmount
+              )}</td>
+          </tr>
+          <!-- Gaji Bersih yang Diterima -->
+          <tr>
+              <td class="total">Gaji Bersih yang Diterima</td>
+              <td class="total">${formatToRupiah(payrollItem.netSalary)}</td>
+          </tr>
+      </table>
+      <div class="footer">
+          <p>Terima kasih atas kerja keras Anda!</p>
+      </div>
+  </div>
 </body>
 </html>
-        `,
-      });
-    }
+      `,
+        })
+      )
+    );
 
     await prisma.payroll.update({
       where: {
